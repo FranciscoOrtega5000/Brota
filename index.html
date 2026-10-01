@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brota · Frijol de torre hidropónica</title>
+<meta name="description" content="Frijol fresco para tu familia, cultivado en torres sin tierra, con agua controlada y sin pesticidas. Producción local y trazable.">
+<script>
+  // Aplica el tema antes de pintar para evitar parpadeo
+  try {
+    var t = localStorage.getItem('tema');
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  } catch (e) { document.documentElement.dataset.theme = 'light'; }
+</script>
+<style>
+:root {
+  --bg: #f6faf6;
+  --surface: #ffffff;
+  --surface-2: #eaf3ec;
+  --text: #14281d;
+  --muted: #536b5c;
+  --border: #d5e4d9;
+  --accent: #059669;
+  --accent-strong: #047857;
+  --accent-soft: #d1f0e0;
+  --on-accent: #ffffff;
+  --water: #0e7490;
+  --shadow: 0 1px 2px rgba(20,40,29,.06), 0 8px 24px rgba(20,40,29,.06);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+:root[data-theme="dark"] {
+  --bg: #0c1511;
+  --surface: #131f19;
+  --surface-2: #192a21;
+  --text: #e6f2ea;
+  --muted: #94ad9f;
+  --border: #25382d;
+  --accent: #10b981;
+  --accent-strong: #34d399;
+  --accent-soft: #123327;
+  --on-accent: #04130c;
+  --water: #22d3ee;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out);
+}
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; }
+.icon { width: 1.25em; height: 1.25em; fill: currentColor; flex: none; }
+.wrap { width: min(1120px, 100% - 32px); margin-inline: auto; }
+section { padding: 88px 0; }
+h1, h2, h3 { line-height: 1.15; letter-spacing: -0.02em; margin: 0; }
+h2 { font-size: clamp(1.75rem, 3.4vw, 2.5rem); }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .8125rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--accent-strong); margin-bottom: 14px;
+}
+.lead { color: var(--muted); font-size: 1.125rem; max-width: 56ch; margin: 16px 0 0; }
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font: inherit; font-weight: 600; font-size: 1rem;
+  padding: 12px 22px; border-radius: 12px; border: 1px solid transparent;
+  text-decoration: none; cursor: pointer; min-height: 46px;
+  transition: transform 140ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out);
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent); color: var(--on-accent); }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-ghost:hover { background: var(--surface-2); }
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+/* Nav */
+header {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.125rem; text-decoration: none; }
+.brand .icon { color: var(--accent); width: 1.5em; height: 1.5em; }
+.nav-links { display: flex; align-items: center; gap: 4px; }
+.nav-links a:not(.btn) { text-decoration: none; padding: 8px 12px; border-radius: 8px; color: var(--muted); font-size: .9375rem; transition: color 130ms var(--ease-out), background-color 130ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .nav-links a:not(.btn):hover { color: var(--text); background: var(--surface-2); } }
+.icon-btn {
+  display: inline-grid; place-items: center; width: 40px; height: 40px;
+  background: none; border: 0; border-radius: 10px; color: var(--text); cursor: pointer;
+  transition: transform 140ms var(--ease-out), background-color 130ms var(--ease-out);
+}
+.icon-btn:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .icon-btn:hover { background: var(--surface-2); } }
+.icon-btn .icon { width: 22px; height: 22px; }
+#tema .luna { display: none; }
+:root[data-theme="light"] #tema .sol { display: none; }
+:root[data-theme="light"] #tema .luna { display: block; }
+#menu-btn { display: none; }
+
+@media (max-width: 760px) {
+  #menu-btn { display: inline-grid; }
+  .nav-links {
+    position: absolute; top: 64px; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; padding: 12px 16px 16px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    opacity: 0; transform: translateY(-6px); pointer-events: none;
+    transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+  }
+  .nav-links.open { opacity: 1; transform: none; pointer-events: auto; }
+  .nav-links a:not(.btn) { padding: 12px; }
+  .nav-actions { display: flex; align-items: center; gap: 4px; }
+}
+@media (min-width: 761px) { .nav-actions { display: contents; } }
+
+/* Hero */
+.hero { padding: 72px 0 96px; }
+.hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+.hero h1 { font-size: clamp(2.25rem, 5.5vw, 3.875rem); }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.hero-stats { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--border); }
+.hero-stats strong { display: block; font-size: 1.5rem; letter-spacing: -0.02em; }
+.hero-stats span { color: var(--muted); font-size: .875rem; }
+.tower-card {
+  background: linear-gradient(160deg, var(--accent-soft), var(--surface-2));
+  border: 1px solid var(--border); border-radius: 28px; padding: 24px;
+  box-shadow: var(--shadow);
+}
+.tower-card svg { width: 100%; height: auto; }
+.tower-body { fill: var(--surface); stroke: var(--border); stroke-width: 2; }
+.tower-pod { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.tower-leaf { fill: var(--accent); }
+.tower-drop { fill: var(--water); opacity: .85; }
+.tower-sensor { fill: var(--surface); stroke: var(--accent-strong); stroke-width: 2; }
+.tower-label { fill: var(--muted); font-size: 13px; font-family: inherit; }
+.drop-a { animation: caer 2.4s var(--ease-in-out) infinite; }
+.drop-b { animation: caer 2.4s var(--ease-in-out) infinite .8s; }
+.drop-c { animation: caer 2.4s var(--ease-in-out) infinite 1.6s; }
+@keyframes caer { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .85; } 85% { opacity: .85; } 100% { transform: translateY(220px); opacity: 0; } }
+
+@media (max-width: 860px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .tower-card { max-width: 420px; }
+  section { padding: 64px 0; }
+}
+
+/* Qué es */
+.alt { background: var(--surface-2); border-block: 1px solid var(--border); }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+.diffs { display: grid; gap: 16px; }
+.diff {
+  display: flex; gap: 16px; padding: 20px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+}
+.diff .ico { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-soft); color: var(--accent-strong); display: grid; place-items: center; flex: none; }
+.diff .ico .icon { width: 24px; height: 24px; }
+.diff h3 { font-size: 1.0625rem; margin-bottom: 4px; letter-spacing: -0.01em; }
+.diff p { margin: 0; color: var(--muted); font-size: .9375rem; }
+@media (max-width: 860px) { .split { grid-template-columns: 1fr; gap: 32px; } }
+
+/* Cómo funciona */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; counter-reset: paso; }
+.step {
+  position: relative; padding: 28px 24px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+.step::before {
+  counter-increment: paso; content: counter(paso);
+  position: absolute; top: 20px; right: 22px;
+  font-size: 2.5rem; font-weight: 700; color: var(--accent-soft); line-height: 1;
+}
+.step .ico { width: 52px; height: 52px; border-radius: 14px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; margin-bottom: 18px; }
+.step .ico .icon { width: 28px; height: 28px; }
+.step h3 { font-size: 1.25rem; margin-bottom: 8px; }
+.step p { margin: 0; color: var(--muted); }
+@media (max-width: 860px) { .steps { grid-template-columns: 1fr; } }
+
+/* Beneficios */
+.benefits { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 48px; }
+.benefit { padding: 24px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+.benefit .icon { width: 32px; height: 32px; color: var(--accent); margin-bottom: 16px; }
+.benefit h3 { font-size: 1.125rem; margin-bottom: 6px; }
+.benefit p { margin: 0; color: var(--muted); font-size: .9375rem; }
+@media (max-width: 960px) { .benefits { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .benefits { grid-template-columns: 1fr; } }
+
+/* Contacto */
+.contact-card {
+  display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px;
+  padding: 40px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 28px; box-shadow: var(--shadow);
+}
+.contact-info ul { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; color: var(--muted); }
+.contact-info li { display: flex; gap: 10px; align-items: center; }
+.contact-info .icon { color: var(--accent); }
+form { display: grid; gap: 16px; }
+.field { display: grid; gap: 6px; }
+label { font-size: .875rem; font-weight: 600; }
+input, select, textarea {
+  font: inherit; color: var(--text); background: var(--bg);
+  border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; width: 100%;
+  transition: border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+}
+textarea { resize: vertical; min-height: 96px; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 860px) { .contact-card { grid-template-columns: 1fr; padding: 24px; gap: 32px; } }
+@media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+
+footer { padding: 32px 0 48px; color: var(--muted); font-size: .875rem; border-top: 1px solid var(--border); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+
+/* Toast: transición (no keyframe) para que sea interrumpible */
+.toast {
+  position: fixed; left: 50%; bottom: 24px; z-index: 40;
+  transform: translate(-50%, 12px); opacity: 0; pointer-events: none;
+  background: var(--text); color: var(--bg); padding: 12px 18px; border-radius: 12px;
+  font-size: .9375rem; max-width: calc(100% - 32px);
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* Entrada al hacer scroll: solo secciones, una vez */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out); }
+.reveal.in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { transform: none; }
+  .btn:active, .icon-btn:active { transform: none; }
+  .drop-a, .drop-b, .drop-c { animation: none; opacity: .85; }
+  .toast, .toast.show { transform: translate(-50%, 0); }
+  .nav-links, .nav-links.open { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-leaf" viewBox="0 0 256 256"><path d="M223.45,40.07a8,8,0,0,0-7.52-7.52C139.8,28.08,78.82,51,52.82,94a87.09,87.09,0,0,0-12.76,49c.57,15.92,5.21,32,13.79,47.85l-19.51,19.5a8,8,0,0,0,11.32,11.32l19.5-19.51C81,210.73,97.09,215.37,113,215.94q1.67.06,3.33.06A86.93,86.93,0,0,0,162,203.18C205,177.18,227.93,116.21,223.45,40.07ZM153.75,189.5c-22.75,13.78-49.68,14-76.71.77l88.63-88.62a8,8,0,0,0-11.32-11.32L65.73,179c-13.19-27-13-54,.77-76.71,22.09-36.47,74.6-56.44,141.31-54.06C210.2,114.89,190.22,167.41,153.75,189.5Z"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 256 256"><path d="M174,47.75a254.19,254.19,0,0,0-41.45-38.3,8,8,0,0,0-9.18,0A254.19,254.19,0,0,0,82,47.75C54.51,79.32,40,112.6,40,144a88,88,0,0,0,176,0C216,112.6,201.49,79.32,174,47.75ZM128,216a72.08,72.08,0,0,1-72-72c0-57.23,55.47-105,72-118,16.53,13,72,60.75,72,118A72.08,72.08,0,0,1,128,216Zm55.89-62.66a57.6,57.6,0,0,1-46.56,46.55A8.75,8.75,0,0,1,136,200a8,8,0,0,1-1.32-15.89c16.57-2.79,30.63-16.85,33.44-33.45a8,8,0,0,1,15.78,2.68Z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 256 256"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 256 256"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></symbol>
+  <symbol id="i-plant" viewBox="0 0 256 256"><path d="M247.63,47.89a8,8,0,0,0-7.52-7.52c-51.76-3-93.32,12.74-111.18,42.22-11.8,19.49-11.78,43.16-.16,65.74a71.34,71.34,0,0,0-14.17,27L98.33,159c7.82-16.33,7.52-33.35-1-47.49-13.2-21.79-43.67-33.47-81.5-31.25a8,8,0,0,0-7.52,7.52c-2.23,37.83,9.46,68.3,31.25,81.5A45.82,45.82,0,0,0,63.44,176,54.58,54.58,0,0,0,87,170.33l25,25V224a8,8,0,0,0,16,0V194.51a55.61,55.61,0,0,1,12.27-35,73.91,73.91,0,0,0,33.31,8.4,60.9,60.9,0,0,0,31.83-8.86C234.89,141.21,250.67,99.65,247.63,47.89ZM47.81,155.6C32.47,146.31,23.79,124.32,24,96c28.32-.24,50.31,8.47,59.6,23.81,4.85,8,5.64,17.33,2.46,26.94L61.65,122.34a8,8,0,0,0-11.31,11.31l24.41,24.41C65.14,161.24,55.82,160.45,47.81,155.6Zm149.31-10.22c-13.4,8.11-29.15,8.73-45.15,2l53.69-53.7a8,8,0,0,0-11.31-11.31L140.65,136c-6.76-16-6.15-31.76,2-45.15,13.94-23,47-35.82,89.33-34.83C232.94,98.34,220.14,131.44,197.12,145.38Z"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 256 256"><path d="M152,96H104a8,8,0,0,0-8,8v48a8,8,0,0,0,8,8h48a8,8,0,0,0,8-8V104A8,8,0,0,0,152,96Zm-8,48H112V112h32Zm88,0H216V112h16a8,8,0,0,0,0-16H216V56a16,16,0,0,0-16-16H160V24a8,8,0,0,0-16,0V40H112V24a8,8,0,0,0-16,0V40H56A16,16,0,0,0,40,56V96H24a8,8,0,0,0,0,16H40v32H24a8,8,0,0,0,0,16H40v40a16,16,0,0,0,16,16H96v16a8,8,0,0,0,16,0V216h32v16a8,8,0,0,0,16,0V216h40a16,16,0,0,0,16-16V160h16a8,8,0,0,0,0-16Zm-32,56H56V56H200v95.87s0,.09,0,.13,0,.09,0,.13V200Z"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 256 256"><path d="M207.06,72.67A111.24,111.24,0,0,0,128,40h-.4C66.07,40.21,16,91,16,153.13V176a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V152A111.25,111.25,0,0,0,207.06,72.67ZM224,176H119.71l54.76-75.3a8,8,0,0,0-12.94-9.42L99.92,176H32V153.13c0-3.08.15-6.12.43-9.13H56a8,8,0,0,0,0-16H35.27c10.32-38.86,44-68.24,84.73-71.66V80a8,8,0,0,0,16,0V56.33A96.14,96.14,0,0,1,221,128H200a8,8,0,0,0,0,16h23.67c.21,2.65.33,5.31.33,8Z"/></symbol>
+  <symbol id="i-recycle" viewBox="0 0 256 256"><path d="M96,208a8,8,0,0,1-8,8H40a24,24,0,0,1-20.77-36l34.29-59.25L39.47,124.5A8,8,0,1,1,35.33,109l32.77-8.77a8,8,0,0,1,9.8,5.66l8.79,32.77A8,8,0,0,1,81,148.5a8.37,8.37,0,0,1-2.08.27,8,8,0,0,1-7.72-5.93l-3.8-14.15L33.11,188A8,8,0,0,0,40,200H88A8,8,0,0,1,96,208Zm140.73-28-23.14-40a8,8,0,0,0-13.84,8l23.14,40A8,8,0,0,1,216,200H147.31l10.34-10.34a8,8,0,0,0-11.31-11.32l-24,24a8,8,0,0,0,0,11.32l24,24a8,8,0,0,0,11.31-11.32L147.31,216H216a24,24,0,0,0,20.77-36ZM128,32a7.85,7.85,0,0,1,6.92,4l34.29,59.25-14.08-3.78A8,8,0,0,0,151,106.92l32.78,8.79a8.23,8.23,0,0,0,2.07.27,8,8,0,0,0,7.72-5.93l8.79-32.79a8,8,0,1,0-15.45-4.14l-3.8,14.17L148.77,28a24,24,0,0,0-41.54,0L84.07,68a8,8,0,0,0,13.85,8l23.16-40A7.85,7.85,0,0,1,128,32Z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 256 256"><path d="M208,40H48A16,16,0,0,0,32,56v56c0,52.72,25.52,84.67,46.93,102.19,23.06,18.86,46,25.26,47,25.53a8,8,0,0,0,4.2,0c1-.27,23.91-6.67,47-25.53C198.48,196.67,224,164.72,224,112V56A16,16,0,0,0,208,40Zm0,72c0,37.07-13.66,67.16-40.6,89.42A129.3,129.3,0,0,1,128,223.62a128.25,128.25,0,0,1-38.92-21.81C61.82,179.51,48,149.3,48,112l0-56,160,0ZM82.34,141.66a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32l-56,56a8,8,0,0,1-11.32,0Z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 256 256"><path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 256 256"><path d="M227.32,28.68a16,16,0,0,0-15.66-4.08l-.15,0L19.57,82.84a16,16,0,0,0-2.49,29.8L102,154l41.3,84.87A15.86,15.86,0,0,0,157.74,248q.69,0,1.38-.06a15.88,15.88,0,0,0,14-11.51l58.2-191.94c0-.05,0-.1,0-.15A16,16,0,0,0,227.32,28.68ZM157.83,231.85l-.05.14,0-.07-40.06-82.3,48-48a8,8,0,0,0-11.31-11.31l-48,48L24.08,98.25l-.07,0,.14,0L216,40Z"/></symbol>
+  <symbol id="i-thermo" viewBox="0 0 256 256"><path d="M212,56a28,28,0,1,0,28,28A28,28,0,0,0,212,56Zm0,40a12,12,0,1,1,12-12A12,12,0,0,1,212,96Zm-84,57V88a8,8,0,0,0-16,0v65a32,32,0,1,0,16,0Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,120,200Zm40-66V48a40,40,0,0,0-80,0v86a64,64,0,1,0,80,0Zm-40,98a48,48,0,0,1-27.42-87.4A8,8,0,0,0,96,138V48a24,24,0,0,1,48,0v90a8,8,0,0,0,3.42,6.56A48,48,0,0,1,120,232Z"/></symbol>
+  <symbol id="i-brain" viewBox="0 0 256 256"><path d="M248,124a56.11,56.11,0,0,0-32-50.61V72a48,48,0,0,0-88-26.49A48,48,0,0,0,40,72v1.39a56,56,0,0,0,0,101.2V176a48,48,0,0,0,88,26.49A48,48,0,0,0,216,176v-1.41A56.09,56.09,0,0,0,248,124ZM88,208a32,32,0,0,1-31.81-28.56A55.87,55.87,0,0,0,64,180h8a8,8,0,0,0,0-16H64A40,40,0,0,1,50.67,86.27,8,8,0,0,0,56,78.73V72a32,32,0,0,1,64,0v68.26A47.8,47.8,0,0,0,88,128a8,8,0,0,0,0,16,32,32,0,0,1,0,64Zm104-44h-8a8,8,0,0,0,0,16h8a55.87,55.87,0,0,0,7.81-.56A32,32,0,1,1,168,144a8,8,0,0,0,0-16,47.8,47.8,0,0,0-32,12.26V72a32,32,0,0,1,64,0v6.73a8,8,0,0,0,5.33,7.54A40,40,0,0,1,192,164Zm16-52a8,8,0,0,1-8,8h-4a36,36,0,0,1-36-36V80a8,8,0,0,1,16,0v4a20,20,0,0,0,20,20h4A8,8,0,0,1,208,112ZM60,120H56a8,8,0,0,1,0-16h4A20,20,0,0,0,80,84V80a8,8,0,0,1,16,0v4A36,36,0,0,1,60,120Z"/></symbol>
+</svg>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#inicio"><svg class="icon"><use href="#i-leaf"/></svg>Brota</a>
+    <div class="nav-actions">
+      <nav class="nav-links" id="nav-links" aria-label="Principal">
+        <a href="#producto">Producto</a>
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#beneficios">Beneficios</a>
+        <a class="btn btn-primary" href="#pedido" style="min-height:40px;padding:8px 16px;margin-left:8px">Hacer pedido</a>
+      </nav>
+      <button class="icon-btn" id="tema" type="button" aria-label="Cambiar tema">
+        <svg class="icon sol"><use href="#i-sun"/></svg>
+        <svg class="icon luna"><use href="#i-moon"/></svg>
+      </button>
+      <button class="icon-btn" id="menu-btn" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links">
+        <svg class="icon"><use href="#i-list"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow"><svg class="icon"><use href="#i-plant"/></svg>Para la mesa de tu familia</span>
+        <h1>Comida fresca que puedes servirle a tus hijos <em>con confianza</em>.</h1>
+        <p class="lead">Cultivamos frijol sin tierra, con agua controlada y sin pesticidas, en torres vigiladas por sensores e inteligencia artificial. Sabes de dónde viene cada plato que pones en la mesa.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#pedido">Comprar<svg class="icon"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-ghost" href="#producto">Conocer más</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong>0</strong><span>pesticidas</span></div>
+          <div><strong>Sin tierra</strong><span>ni agua de riego dudosa</span></div>
+          <div><strong>Local</strong><span>de nuestra torre a tu cocina</span></div>
+        </div>
+      </div>
+
+      <div class="tower-card" aria-hidden="true">
+        <svg viewBox="0 0 360 440">
+          <rect class="tower-body" x="130" y="30" width="100" height="360" rx="22"/>
+          <g>
+            <rect class="tower-pod" x="148" y="62" width="64" height="40" rx="12"/>
+            <rect class="tower-pod" x="148" y="132" width="64" height="40" rx="12"/>
+            <rect class="tower-pod" x="148" y="202" width="64" height="40" rx="12"/>
+            <rect class="tower-pod" x="148" y="272" width="64" height="40" rx="12"/>
+          </g>
+          <g class="tower-leaf">
+            <path d="M230 78c26-4 46 6 54 26-24 6-46-4-54-26z"/>
+            <path d="M130 148c-26-4-46 6-54 26 24 6 46-4 54-26z"/>
+            <path d="M230 218c26-4 46 6 54 26-24 6-46-4-54-26z"/>
+            <path d="M130 288c-26-4-46 6-54 26 24 6 46-4 54-26z"/>
+          </g>
+          <path class="tower-drop drop-a" d="M180 40c-7 10-10 16-10 21a10 10 0 0 0 20 0c0-5-3-11-10-21z"/>
+          <path class="tower-drop drop-b" d="M180 40c-7 10-10 16-10 21a10 10 0 0 0 20 0c0-5-3-11-10-21z"/>
+          <path class="tower-drop drop-c" d="M180 40c-7 10-10 16-10 21a10 10 0 0 0 20 0c0-5-3-11-10-21z"/>
+          <rect x="110" y="390" width="140" height="34" rx="12" class="tower-body"/>
+          <text class="tower-label" x="180" y="412" text-anchor="middle">depósito</text>
+          <circle class="tower-sensor" cx="242" cy="180" r="9"/>
+          <circle class="tower-sensor" cx="118" cy="110" r="9"/>
+          <circle class="tower-sensor" cx="242" cy="320" r="9"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="producto" class="alt reveal">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow"><svg class="icon"><use href="#i-leaf"/></svg>El producto</span>
+        <h2>Frijol que crece en una torre limpia, no en el suelo.</h2>
+        <p class="lead">Cuando un alimento se cultiva en campo abierto, el suelo y el agua de riego son parte del riesgo. En nuestra torre hidropónica/aeropónica las raíces reciben solo agua con nutrientes, en circuito controlado y sin tierra. Menos puntos por donde algo pueda contaminarse, y más tranquilidad para tu familia.</p>
+      </div>
+      <div class="diffs">
+        <div class="diff">
+          <div class="ico"><svg class="icon"><use href="#i-brain"/></svg></div>
+          <div><h3>Agua vigilada</h3><p>Sensores e IA controlan el riego de cada ciclo. No dependemos de agua de canal ni de procedencia incierta.</p></div>
+        </div>
+        <div class="diff">
+          <div class="ico"><svg class="icon"><use href="#i-drop"/></svg></div>
+          <div><h3>Mucha menos agua</h3><p>El agua se recircula en circuito cerrado y solo se repone lo que la planta consume. Cuidas a tu familia y también el planeta que van a heredar.</p></div>
+        </div>
+        <div class="diff">
+          <div class="ico"><svg class="icon"><use href="#i-plant"/></svg></div>
+          <div><h3>Cosechado cerca de ti</h3><p>Crece en la ciudad y llega en pocos días: menos traslados, más frescura y un productor al que puedes preguntarle.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="como-funciona" class="reveal">
+    <div class="wrap">
+      <span class="eyebrow"><svg class="icon"><use href="#i-cpu"/></svg>Cómo funciona</span>
+      <h2>Tres pasos, cero adivinanza.</h2>
+      <p class="lead">Así cuidamos cada planta antes de que llegue a tu casa. El ciclo se repite las 24 horas.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="ico"><svg class="icon"><use href="#i-thermo"/></svg></div>
+          <h3>Sensores miden</h3>
+          <p>Humedad, temperatura y condición de la solución nutritiva se registran de forma constante en toda la torre.</p>
+        </div>
+        <div class="step">
+          <div class="ico"><svg class="icon"><use href="#i-brain"/></svg></div>
+          <h3>La IA calcula</h3>
+          <p>Con esas lecturas, el modelo estima cuánta agua necesita el cultivo en este momento, ni más ni menos.</p>
+        </div>
+        <div class="step">
+          <div class="ico"><svg class="icon"><use href="#i-drop"/></svg></div>
+          <h3>Riego automático</h3>
+          <p>La bomba entrega el volumen calculado y el excedente regresa al depósito para volver a usarse.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="beneficios" class="alt reveal">
+    <div class="wrap">
+      <span class="eyebrow"><svg class="icon"><use href="#i-shield"/></svg>Beneficios</span>
+      <h2>Lo que tu familia gana en cada comida.</h2>
+      <div class="benefits">
+        <div class="benefit"><svg class="icon"><use href="#i-leaf"/></svg><h3>Frescura real</h3><p>Se cosecha cerca y llega rápido: sabor y nutrientes en su mejor momento para los más pequeños.</p></div>
+        <div class="benefit"><svg class="icon"><use href="#i-shield"/></svg><h3>Más tranquilidad</h3><p>Sin tierra ni agua de riego externa, hay menos vías de contaminación, algo que preocupa cuando se oye de brotes por alimentos crudos.</p></div>
+        <div class="benefit"><svg class="icon"><use href="#i-plant"/></svg><h3>Sin pesticidas</h3><p>El ambiente controlado reduce plagas, así que no hace falta rociar agroquímicos sobre lo que comen tus hijos.</p></div>
+        <div class="benefit"><svg class="icon"><use href="#i-pin"/></svg><h3>Sabes de dónde viene</h3><p>Productor local y trazable: puedes preguntar cómo se cultivó lo que sirves.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pedido" class="reveal">
+    <div class="wrap">
+      <div class="contact-card">
+        <div class="contact-info">
+          <span class="eyebrow"><svg class="icon"><use href="#i-send"/></svg>Pedidos y contacto</span>
+          <h2>Lleva frijol fresco a tu mesa.</h2>
+          <p class="lead">Cuéntanos cuántas personas son en casa y te respondemos con disponibilidad y precio.</p>
+          <ul>
+            <li><svg class="icon"><use href="#i-pin"/></svg>Entrega local a domicilio</li>
+            <li><svg class="icon"><use href="#i-leaf"/></svg>Cosecha por temporada</li>
+          </ul>
+        </div>
+        <form id="form-pedido" novalidate>
+          <div class="row">
+            <div class="field"><label for="nombre">Nombre</label><input id="nombre" name="nombre" autocomplete="name" required></div>
+            <div class="field"><label for="contacto">Correo o teléfono</label><input id="contacto" name="contacto" autocomplete="email" required></div>
+          </div>
+          <div class="field">
+            <label for="cantidad">Cantidad</label>
+            <select id="cantidad" name="cantidad">
+              <option>500 g (1-2 personas)</option>
+              <option>1 kg (familia pequeña)</option>
+              <option>2 kg (familia grande)</option>
+              <option>Pedido semanal</option>
+            </select>
+          </div>
+          <div class="field"><label for="mensaje">Mensaje (opcional)</label><textarea id="mensaje" name="mensaje"></textarea></div>
+          <button class="btn btn-primary" type="submit">Enviar pedido<svg class="icon"><use href="#i-send"/></svg></button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="anio"></span> Brota · Cultivo hidropónico inteligente</span>
+    <span>Hecho con riego medido.</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  // Destino de los pedidos. Cambiar por el correo real antes de publicar.
+  var PEDIDOS_EMAIL = 'pedidos@ejemplo.com';
+
+  var root = document.documentElement;
+  document.getElementById('anio').textContent = new Date().getFullYear();
+
+  document.getElementById('tema').addEventListener('click', function () {
+    var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem('tema', next); } catch (e) {}
+  });
+
+  var menuBtn = document.getElementById('menu-btn');
+  var links = document.getElementById('nav-links');
+  function setMenu(open) {
+    links.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', open);
+    menuBtn.querySelector('use').setAttribute('href', open ? '#i-x' : '#i-list');
+  }
+  menuBtn.addEventListener('click', function () { setMenu(!links.classList.contains('open')); });
+  links.addEventListener('click', function (e) { if (e.target.closest('a')) setMenu(false); });
+
+  var toast = document.getElementById('toast'), toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 3500);
+  }
+
+  document.getElementById('form-pedido').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = e.target;
+    if (!f.nombre.value.trim() || !f.contacto.value.trim()) {
+      showToast('Completa tu nombre y un medio de contacto.');
+      (f.nombre.value.trim() ? f.contacto : f.nombre).focus();
+      return;
+    }
+    var cuerpo = 'Nombre: ' + f.nombre.value.trim() +
+      '\nContacto: ' + f.contacto.value.trim() +
+      '\nCantidad: ' + f.cantidad.value +
+      (f.mensaje.value.trim() ? '\n\n' + f.mensaje.value.trim() : '');
+    location.href = 'mailto:' + PEDIDOS_EMAIL +
+      '?subject=' + encodeURIComponent('Pedido de frijol') +
+      '&body=' + encodeURIComponent(cuerpo);
+    showToast('Abriendo tu correo para enviar el pedido…');
+  });
+
+  var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.12 }) : null;
+  document.querySelectorAll('.reveal').forEach(function (el) {
+    if (io) io.observe(el); else el.classList.add('in');
+  });
+</script>
+</body>
+</html>
